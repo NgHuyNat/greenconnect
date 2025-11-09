@@ -1,0 +1,25 @@
+meta {
+  name: Cancel Donation
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/donations/{{donationId}}/cancel
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+tests {
+  test("should cancel donation successfully", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().success).to.be.true;
+    expect(res.getBody().message).to.contain("cancelled");
+  });
+}

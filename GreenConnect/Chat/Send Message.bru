@@ -1,0 +1,41 @@
+meta {
+  name: Send Message
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/chat/messages
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MzYzOWQzYi01OTc5LTQ0ZWItYmI2Ny0wZGE5NGRlM2E5OWYiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkJPVEgiLCJpYXQiOjE3NjIwOTc4MjgsImV4cCI6MTc2MjcwMjYyOH0.vKjwYt46HXotxmthJxWKPAVB2BTPWjJavZiM6Uw9sVM
+}
+
+body:json {
+  {
+    "conversationId": "29ce65c4-f663-4452-8187-d1e5932d40d7",
+    "content": "Hello! This is a test message HuyTan",
+    "type": "TEXT"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3001/api/v1
+  conversationId: 29ce65c4-f663-4452-8187-d1e5932d40d7
+}
+
+tests {
+  test("should send message successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('content');
+    expect(res.getBody()).to.have.property('sender');
+    expect(res.getBody().content).to.include("test message");
+    
+    // Store message ID for other tests
+    bru.setVar("messageId", res.getBody().id);
+  });
+}

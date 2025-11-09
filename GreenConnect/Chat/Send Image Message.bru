@@ -1,0 +1,36 @@
+meta {
+  name: Send Image Message
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/chat/messages
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "conversationId": "{{conversationId}}",
+    "content": "Check out this eco-friendly product!",
+    "type": "image",
+    "imageUrl": "https://example.com/eco-product.jpg"
+  }
+}
+
+tests {
+  test("should send image message successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('content');
+    expect(res.getBody()).to.have.property('type');
+    expect(res.getBody()).to.have.property('sender');
+    expect(res.getBody().type).to.equal("image");
+    expect(res.getBody().content).to.include("eco-friendly");
+  });
+}

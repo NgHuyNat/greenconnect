@@ -1,0 +1,27 @@
+meta {
+  name: Get Categories
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3001/api/v1/products/categories/list
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response contains categories", function() {
+    expect(res.getBody()).to.be.an('array');
+    expect(res.getBody().length).to.be.greaterThan(0);
+  });
+}

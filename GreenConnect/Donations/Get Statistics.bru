@@ -1,0 +1,28 @@
+meta {
+  name: Get Donation Statistics
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/donations/stats
+  body: none
+  auth: none
+}
+
+tests {
+  test("should get donation statistics", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('totalAmount');
+    expect(res.getBody()).to.have.property('totalDonations');
+    expect(res.getBody()).to.have.property('averageDonation');
+    expect(res.getBody()).to.have.property('donationsByType');
+    expect(res.getBody()).to.have.property('donationsByStatus');
+    
+    expect(res.getBody().totalAmount).to.be.a('number');
+    expect(res.getBody().totalDonations).to.be.a('number');
+    expect(res.getBody().averageDonation).to.be.a('number');
+    expect(res.getBody().donationsByType).to.be.an('object');
+    expect(res.getBody().donationsByStatus).to.be.an('object');
+  });
+}

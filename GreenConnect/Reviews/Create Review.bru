@@ -1,0 +1,55 @@
+meta {
+  name: Create Review
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/reviews
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "productId": "{{testProductId}}",
+    "rating": 5,
+    "title": "Excellent eco-friendly product!",
+    "comment": "Sản phẩm chất lượng, vải cotton rất mềm mại và thân thiện với môi trường. Rất hài lòng với chất lượng và dịch vụ giao hàng nhanh chóng."
+  }
+}
+
+vars:pre-request {
+  testProductId: 550e8400-e29b-41d4-a716-446655440000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("should create review successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('rating');
+    expect(res.getBody()).to.have.property('title');
+    expect(res.getBody()).to.have.property('comment');
+    expect(res.getBody().rating).to.equal(5);
+    expect(res.getBody().title).to.equal("Excellent eco-friendly product!");
+    
+    // Store review ID for other tests
+    bru.setVar("reviewId", res.getBody().id);
+  });
+  
+  test("should include user and product relations", function() {
+    expect(res.getBody()).to.have.property('user');
+    expect(res.getBody()).to.have.property('product');
+    expect(res.getBody().user).to.have.property('id');
+    expect(res.getBody().product).to.have.property('id');
+  });
+}

@@ -1,0 +1,36 @@
+meta {
+  name: Create Conversation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/chat/conversations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "recipientId": "{{recipientUserId}}"
+  }
+}
+
+vars:pre-request {
+  recipientUserId: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
+}
+
+tests {
+  test("should create conversation successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('participants');
+    
+    // Store conversation ID for other tests
+    bru.setVar("conversationId", res.getBody().id);
+  });
+}

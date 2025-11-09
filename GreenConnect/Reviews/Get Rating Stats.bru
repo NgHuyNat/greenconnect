@@ -1,0 +1,37 @@
+meta {
+  name: Get Product Rating Stats
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/reviews/product/{{testProductId}}/stats
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  testProductId: 550e8400-e29b-41d4-a716-446655440000
+}
+
+tests {
+  test("should get product rating statistics", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('averageRating');
+    expect(res.getBody()).to.have.property('totalReviews');
+    expect(res.getBody()).to.have.property('ratingDistribution');
+    
+    expect(res.getBody().averageRating).to.be.a('number');
+    expect(res.getBody().totalReviews).to.be.a('number');
+    expect(res.getBody().ratingDistribution).to.be.an('object');
+  });
+  
+  test("rating distribution should have correct structure", function() {
+    const distribution = res.getBody().ratingDistribution;
+    expect(distribution).to.have.property('1');
+    expect(distribution).to.have.property('2');
+    expect(distribution).to.have.property('3');
+    expect(distribution).to.have.property('4');
+    expect(distribution).to.have.property('5');
+  });
+}

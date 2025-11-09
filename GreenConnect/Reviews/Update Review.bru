@@ -1,0 +1,35 @@
+meta {
+  name: Update Review
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/reviews/{{reviewId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "rating": 4,
+    "title": "Updated review title",
+    "comment": "Updated comment after using the product for more time. Still good but found some minor issues."
+  }
+}
+
+tests {
+  test("should update review successfully", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('rating');
+    expect(res.getBody()).to.have.property('title');
+    expect(res.getBody()).to.have.property('comment');
+    expect(res.getBody().rating).to.equal(4);
+    expect(res.getBody().title).to.equal("Updated review title");
+  });
+}

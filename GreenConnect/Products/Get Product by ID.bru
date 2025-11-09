@@ -1,0 +1,36 @@
+meta {
+  name: Get Product by ID
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3001/api/v1/products/{{productId}}
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+vars:pre-request {
+  productId: 670123456789abcdef012345
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+  
+  if (res.getStatus() === 200) {
+    test("Product has required fields", function() {
+      const product = res.getBody();
+      expect(product).to.have.property('_id');
+      expect(product).to.have.property('title');
+      expect(product).to.have.property('price');
+      expect(product).to.have.property('seller');
+    });
+  }
+}

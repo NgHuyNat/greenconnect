@@ -1,0 +1,33 @@
+meta {
+  name: Get Recent Donations
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/donations/recent?limit=5
+  body: none
+  auth: none
+}
+
+tests {
+  test("should get recent donations", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an('array');
+    expect(res.getBody().length).to.be.at.most(5);
+    
+    if (res.getBody().length > 0) {
+      expect(res.getBody()[0]).to.have.property('id');
+      expect(res.getBody()[0]).to.have.property('amount');
+      expect(res.getBody()[0]).to.have.property('type');
+      expect(res.getBody()[0]).to.have.property('createdAt');
+      
+      // Check if donations are sorted by date (most recent first)
+      if (res.getBody().length > 1) {
+        const firstDate = new Date(res.getBody()[0].createdAt);
+        const secondDate = new Date(res.getBody()[1].createdAt);
+        expect(firstDate.getTime()).to.be.at.least(secondDate.getTime());
+      }
+    }
+  });
+}

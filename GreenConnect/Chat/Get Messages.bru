@@ -1,0 +1,31 @@
+meta {
+  name: Get Messages
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/chat/conversations/{{conversationId}}/messages?page=1&limit=20
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+tests {
+  test("should get conversation messages", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('messages');
+    expect(res.getBody()).to.have.property('pagination');
+    expect(res.getBody().messages).to.be.an('array');
+    
+    if (res.getBody().messages.length > 0) {
+      expect(res.getBody().messages[0]).to.have.property('id');
+      expect(res.getBody().messages[0]).to.have.property('content');
+      expect(res.getBody().messages[0]).to.have.property('sender');
+      expect(res.getBody().messages[0]).to.have.property('createdAt');
+    }
+  });
+}

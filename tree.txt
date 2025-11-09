@@ -1,0 +1,49 @@
+
+├── apps
+│   ├── backend
+│   │   ├── Dockerfile
+│   │   ├── nest-cli.json
+│   │   ├── package.json
+│   │   ├── prisma
+│   │   │   └── schema.prisma
+│   │   ├── src
+│   │   │   ├── app.module.ts
+│   │   │   ├── common
+│   │   │   ├── main.ts
+│   │   │   └── modules
+│   │   ├── tsconfig.build.json
+│   │   ├── tsconfig.json
+│   │   └── uploads
+│   └── frontend
+│       ├── Dockerfile
+│       ├── next.config.js
+│       ├── next-env.d.ts
+│       ├── package.json
+│       ├── postcss.config.js
+│       ├── public
+│       │   └── README.md
+│       ├── src
+│       │   ├── app
+│       │   ├── components
+│       │   ├── hooks
+│       │   ├── lib
+│       │   ├── store
+│       │   ├── styles
+│       │   └── types
+│       ├── tailwind.config.js
+│       └── tsconfig.json
+├── CHAT_README.md
+├── docker-compose.yml
+├── GreenConnect
+│   ├── Auth
+│   │   ├── folder.bru
+│   │   └── Login.bru
+│   └── bruno.json
+├── package.json
+├── package-lock.json
+├── packages
+├── README.md
+├── setup.sh
+└── tree.txt
+
+

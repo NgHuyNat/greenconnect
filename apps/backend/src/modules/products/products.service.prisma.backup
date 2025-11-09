@@ -1,0 +1,467 @@
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { PrismaService } from "../../common/prisma/prisma.service";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
+
+interface FindAllFilters {
+  category?: string;
+  location?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+@Injectable()
+export class ProductsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(filters?: FindAllFilters) {
+    const { category, location, search, page = 1, limit = 10 } = filters || {};
+
+    const where: any = {};
+
+    if (category) {
+      where.category = { contains: category, mode: "insensitive" };
+    }
+
+    if (location) {
+      where.location = { contains: location, mode: "insensitive" };
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          seller: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              phone: true,
+            },
+          },
+          reviews: {
+            select: {
+              rating: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    // Calculate average rating for each product
+    const productsWithRating = products.map((product) => ({
+      ...product,
+      averageRating:
+        product.reviews.length > 0
+          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+            product.reviews.length
+          : 0,
+      reviewCount: product.reviews.length,
+    }));
+
+    return {
+      data: productsWithRating,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findById(id: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phone: true,
+          },
+        },
+        reviews: {
+          include: {
+            buyer: {
+              select: {
+                id: true,
+                fullName: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+
+    // Calculate average rating
+    const averageRating =
+      product.reviews.length > 0
+        ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+          product.reviews.length
+        : 0;
+
+    return {
+      ...product,
+      averageRating,
+      reviewCount: product.reviews.length,
+    };
+  }
+
+  async create(createProductDto: CreateProductDto, sellerId: string) {
+    return this.prisma.product.create({
+      data: {
+        ...createProductDto,
+        sellerId,
+        harvestDate: createProductDto.harvestDate
+          ? new Date(createProductDto.harvestDate)
+          : null,
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async update(id: string, updateProductDto: UpdateProductDto, userId: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      select: { id: true, sellerId: true },
+    });
+
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+
+    if (product.sellerId !== userId) {
+      throw new ForbiddenException("You can only update your own products");
+    }
+
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        ...updateProductDto,
+        harvestDate: updateProductDto.harvestDate
+          ? new Date(updateProductDto.harvestDate)
+          : undefined,
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async delete(id: string, userId: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      select: { id: true, sellerId: true },
+    });
+
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+
+    if (product.sellerId !== userId) {
+      throw new ForbiddenException("You can only delete your own products");
+    }
+
+    await this.prisma.product.delete({
+      where: { id },
+    });
+
+    return { message: "Product deleted successfully" };
+  }
+
+  async findBySeller(sellerId: string) {
+    return this.prisma.product.findMany({
+      where: { sellerId },
+      include: {
+        reviews: {
+          select: {
+            rating: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
+
+  async getCategories() {
+    const { PRODUCT_CATEGORIES } = await import("./dto/product-category.dto");
+
+    // Get categories from actual products in database
+    const dbCategories = await this.prisma.product.groupBy({
+      by: ["category"],
+      _count: {
+        category: true,
+      },
+      orderBy: {
+        _count: {
+          category: "desc",
+        },
+      },
+    });
+
+    // Combine predefined categories with database categories
+    const allCategories = [
+      ...PRODUCT_CATEGORIES,
+      ...dbCategories
+        .filter(
+          (cat) => !PRODUCT_CATEGORIES.find((pc) => pc.name === cat.category)
+        )
+        .map((cat) => ({
+          name: cat.category,
+          icon: "📦",
+          description: `Danh mục ${cat.category}`,
+          count: cat._count.category,
+        })),
+    ];
+
+    return {
+      categories: allCategories,
+      total: allCategories.length,
+    };
+  }
+
+  async getFeaturedProducts(limit: number = 10) {
+    return this.prisma.product.findMany({
+      where: {
+        isPromoted: true,
+        promotedUntil: {
+          gte: new Date(),
+        },
+        status: "AVAILABLE",
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            fullName: true,
+            rating: true,
+          },
+        },
+        reviews: {
+          select: {
+            rating: true,
+          },
+        },
+      },
+      orderBy: [{ promotedUntil: "desc" }, { createdAt: "desc" }],
+      take: limit,
+    });
+  }
+
+  async getPopularProducts(limit: number = 10) {
+    return this.prisma.product.findMany({
+      where: {
+        status: "AVAILABLE",
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            fullName: true,
+            rating: true,
+          },
+        },
+        reviews: {
+          select: {
+            rating: true,
+          },
+        },
+      },
+      orderBy: [
+        { soldCount: "desc" },
+        { viewCount: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: limit,
+    });
+  }
+
+  async incrementViewCount(id: string) {
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        viewCount: {
+          increment: 1,
+        },
+      },
+      select: {
+        id: true,
+        viewCount: true,
+      },
+    });
+  }
+
+  async promoteProduct(id: string, userId: string, days: number) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      select: { id: true, sellerId: true },
+    });
+
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+
+    if (product.sellerId !== userId) {
+      throw new ForbiddenException("You can only promote your own products");
+    }
+
+    const promotedUntil = new Date();
+    promotedUntil.setDate(promotedUntil.getDate() + days);
+
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        isPromoted: true,
+        promotedUntil,
+      },
+      select: {
+        id: true,
+        name: true,
+        isPromoted: true,
+        promotedUntil: true,
+      },
+    });
+  }
+
+  async getSellerStatistics(sellerId: string) {
+    const [
+      totalProducts,
+      availableProducts,
+      totalOrders,
+      totalRevenue,
+      avgRating,
+      totalViews,
+    ] = await Promise.all([
+      // Total products
+      this.prisma.product.count({
+        where: { sellerId },
+      }),
+
+      // Available products
+      this.prisma.product.count({
+        where: { sellerId, status: "AVAILABLE" },
+      }),
+
+      // Total orders
+      this.prisma.order.count({
+        where: { sellerId },
+      }),
+
+      // Total revenue
+      this.prisma.order.aggregate({
+        where: {
+          sellerId,
+          status: { in: ["CONFIRMED", "SHIPPING", "DELIVERED"] },
+        },
+        _sum: { totalPrice: true },
+      }),
+
+      // Average rating
+      this.prisma.review.aggregate({
+        where: {
+          product: { sellerId },
+        },
+        _avg: { rating: true },
+      }),
+
+      // Total views
+      this.prisma.product.aggregate({
+        where: { sellerId },
+        _sum: { viewCount: true },
+      }),
+    ]);
+
+    // Recent orders
+    const recentOrders = await this.prisma.order.findMany({
+      where: { sellerId },
+      include: {
+        product: {
+          select: { name: true, images: true },
+        },
+        buyer: {
+          select: { fullName: true, email: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    });
+
+    // Top products
+    const topProducts = await this.prisma.product.findMany({
+      where: { sellerId },
+      include: {
+        reviews: {
+          select: { rating: true },
+        },
+      },
+      orderBy: [{ soldCount: "desc" }, { viewCount: "desc" }],
+      take: 5,
+    });
+
+    return {
+      overview: {
+        totalProducts,
+        availableProducts,
+        soldOutProducts: totalProducts - availableProducts,
+        totalOrders,
+        totalRevenue: totalRevenue._sum.totalPrice || 0,
+        averageRating: avgRating._avg.rating || 0,
+        totalViews: totalViews._sum.viewCount || 0,
+      },
+      recentOrders,
+      topProducts: topProducts.map((product) => ({
+        ...product,
+        averageRating:
+          product.reviews.length > 0
+            ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+              product.reviews.length
+            : 0,
+      })),
+    };
+  }
+}

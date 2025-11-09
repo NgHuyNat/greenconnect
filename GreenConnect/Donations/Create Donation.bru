@@ -1,0 +1,47 @@
+meta {
+  name: Create Donation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/donations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "amount": 100000,
+    "type": "ENVIRONMENTAL_PROJECT",
+    "description": "Donation for tree planting project in Vietnam. Hope this helps make our environment better.",
+    "isAnonymous": false
+  }
+}
+
+tests {
+  test("should create donation successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('amount');
+    expect(res.getBody()).to.have.property('type');
+    expect(res.getBody()).to.have.property('description');
+    expect(res.getBody()).to.have.property('status');
+    expect(res.getBody().amount).to.equal(100000);
+    expect(res.getBody().type).to.equal("ENVIRONMENTAL_PROJECT");
+    expect(res.getBody().status).to.equal("PENDING");
+    
+    // Store donation ID for other tests
+    bru.setVar("donationId", res.getBody().id);
+  });
+  
+  test("should include donor information", function() {
+    expect(res.getBody()).to.have.property('donor');
+    expect(res.getBody().donor).to.have.property('id');
+    expect(res.getBody().donor).to.have.property('username');
+  });
+}

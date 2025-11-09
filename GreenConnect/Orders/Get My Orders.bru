@@ -1,0 +1,46 @@
+meta {
+  name: Get My Orders
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3001/api/v1/orders
+  body: none
+  auth: bearer
+}
+
+params:query {
+  status: 
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGZkZDY0YWIyMGIxMDVhOWNlYmQ3NTYiLCJ1c2VybmFtZSI6InRlc3R1c2VyIiwicm9sZSI6IkJVWUVSIiwiaWF0IjoxNzYxNzQzNTkxLCJleHAiOjE3NjIzNDgzOTF9.7kfuRss7Pyv3_O73ByHr6-diuHh-lLSfKMFyT_IOqIk
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response is array of orders", function() {
+    expect(res.getBody()).to.be.an('array');
+  });
+  
+  if (res.getBody().length > 0) {
+    test("Orders have required fields", function() {
+      const order = res.getBody()[0];
+      expect(order).to.have.property('_id');
+      expect(order).to.have.property('buyer');
+      expect(order).to.have.property('status');
+      expect(order).to.have.property('items');
+    });
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

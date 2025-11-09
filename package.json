@@ -1,0 +1,40 @@
+{
+  "name": "green-connect",
+  "version": "1.0.0",
+  "description": "Nền tảng kết nối cung cầu nông sản",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd apps/backend && npm run start:dev",
+    "dev:frontend": "cd apps/frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd apps/backend && npm run build",
+    "build:frontend": "cd apps/frontend && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd apps/backend && npm run start:prod",
+    "start:frontend": "cd apps/frontend && npm run start",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd apps/backend && npm run lint",
+    "lint:frontend": "cd apps/frontend && npm run lint",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd apps/backend && npm run test",
+    "test:frontend": "cd apps/frontend && npm run test",
+    "db:generate": "cd apps/backend && npx prisma generate",
+    "db:migrate": "cd apps/backend && npx prisma migrate dev",
+    "db:deploy": "cd apps/backend && npx prisma migrate deploy",
+    "db:studio": "cd apps/backend && npx prisma studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

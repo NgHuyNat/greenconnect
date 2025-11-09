@@ -1,0 +1,31 @@
+meta {
+  name: Get Donation by ID
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/donations/{{donationId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+tests {
+  test("should get donation by ID", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('amount');
+    expect(res.getBody()).to.have.property('type');
+    expect(res.getBody()).to.have.property('description');
+    expect(res.getBody()).to.have.property('status');
+    expect(res.getBody()).to.have.property('donor');
+    expect(res.getBody()).to.have.property('createdAt');
+    expect(res.getBody()).to.have.property('updatedAt');
+    
+    expect(res.getBody().id).to.equal(bru.getVar("donationId"));
+  });
+}

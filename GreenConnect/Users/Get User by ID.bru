@@ -1,0 +1,33 @@
+meta {
+  name: Get User by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3001/api/v1/users/{{userId}}
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+  
+  if (res.getStatus() === 200) {
+    test("User has public info", function() {
+      const user = res.getBody();
+      expect(user).to.have.property('_id');
+      expect(user).to.have.property('username');
+      expect(user).to.have.property('fullName');
+      // Email should not be exposed in public profile
+      expect(user).to.not.have.property('email');
+    });
+  }
+}

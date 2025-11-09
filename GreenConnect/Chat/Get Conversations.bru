@@ -1,0 +1,32 @@
+meta {
+  name: Get Conversations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/chat/conversations
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MzYzOWQzYi01OTc5LTQ0ZWItYmI2Ny0wZGE5NGRlM2E5OWYiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkJPVEgiLCJpYXQiOjE3NjIwOTc4MjgsImV4cCI6MTc2MjcwMjYyOH0.vKjwYt46HXotxmthJxWKPAVB2BTPWjJavZiM6Uw9sVM
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3001
+}
+
+tests {
+  test("should get user conversations", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an('array');
+    
+    if (res.getBody().length > 0) {
+      expect(res.getBody()[0]).to.have.property('id');
+      expect(res.getBody()[0]).to.have.property('participants');
+      expect(res.getBody()[0]).to.have.property('lastMessage');
+    }
+  });
+}

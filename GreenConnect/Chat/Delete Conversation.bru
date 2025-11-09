@@ -1,0 +1,28 @@
+meta {
+  name: Delete Conversation
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/chat/conversations/{{conversationId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+vars:pre-request {
+  bearerToken: 
+  baseUrl: http://localhost:3001
+}
+
+tests {
+  test("should delete conversation successfully", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.be.true;
+  });
+}

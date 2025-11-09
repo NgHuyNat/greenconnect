@@ -1,0 +1,37 @@
+meta {
+  name: Get Order by ID
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3001/api/v1/orders/{{createdOrderId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+  
+  if (res.getStatus() === 200) {
+    test("Order has required fields", function() {
+      const order = res.getBody();
+      expect(order).to.have.property('_id');
+      expect(order).to.have.property('buyer');
+      expect(order).to.have.property('status');
+      expect(order).to.have.property('items');
+      expect(order).to.have.property('totalAmount');
+    });
+  }
+}

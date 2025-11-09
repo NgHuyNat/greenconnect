@@ -1,0 +1,41 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost:3001/api/v1/users/profile
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "fullName": "Nguyen Van Test Updated",
+    "bio": "Passionate about sustainable living and eco-friendly products",
+    "location": "Ho Chi Minh City, Vietnam",
+    "phoneNumber": "0987654321"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Profile updated successfully", function() {
+    const user = res.getBody();
+    expect(user.fullName).to.equal("Nguyen Van Test Updated");
+    expect(user.bio).to.equal("Passionate about sustainable living and eco-friendly products");
+  });
+}

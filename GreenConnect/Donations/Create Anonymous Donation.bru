@@ -1,0 +1,37 @@
+meta {
+  name: Create Anonymous Donation
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/donations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "amount": 50000,
+    "type": "CHARITY",
+    "description": "Anonymous donation to help underprivileged children access eco-friendly products.",
+    "isAnonymous": true
+  }
+}
+
+tests {
+  test("should create anonymous donation successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property('id');
+    expect(res.getBody()).to.have.property('amount');
+    expect(res.getBody()).to.have.property('type');
+    expect(res.getBody()).to.have.property('isAnonymous');
+    expect(res.getBody().amount).to.equal(50000);
+    expect(res.getBody().type).to.equal("CHARITY");
+    expect(res.getBody().isAnonymous).to.be.true;
+  });
+}

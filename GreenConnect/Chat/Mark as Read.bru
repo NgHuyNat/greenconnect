@@ -1,0 +1,28 @@
+meta {
+  name: Mark Messages as Read
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/chat/messages/{{messageId}}/read
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MzYzOWQzYi01OTc5LTQ0ZWItYmI2Ny0wZGE5NGRlM2E5OWYiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkJPVEgiLCJpYXQiOjE3NjIwOTc4MjgsImV4cCI6MTc2MjcwMjYyOH0.vKjwYt46HXotxmthJxWKPAVB2BTPWjJavZiM6Uw9sVM
+}
+
+vars:pre-request {
+  messageId: 4a6ab2a9-2aac-4195-8e28-ff00130a7e2b
+  baseUrl: http://localhost:3001/api/v1
+}
+
+tests {
+  test("should mark messages as read", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.be.true;
+  });
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Get All Donations
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/donations?page=1&limit=10
+  body: none
+  auth: none
+}
+
+tests {
+  test("should get all donations (public)", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('donations');
+    expect(res.getBody()).to.have.property('pagination');
+    expect(res.getBody().donations).to.be.an('array');
+    
+    if (res.getBody().donations.length > 0) {
+      expect(res.getBody().donations[0]).to.have.property('id');
+      expect(res.getBody().donations[0]).to.have.property('amount');
+      expect(res.getBody().donations[0]).to.have.property('type');
+      expect(res.getBody().donations[0]).to.have.property('createdAt');
+    }
+  });
+  
+  test("should have pagination info", function() {
+    expect(res.getBody().pagination).to.have.property('currentPage');
+    expect(res.getBody().pagination).to.have.property('totalPages');
+    expect(res.getBody().pagination).to.have.property('totalItems');
+    expect(res.getBody().pagination).to.have.property('itemsPerPage');
+  });
+}

@@ -1,0 +1,59 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:3001/api/v1/products
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MzYzOWQzYi01OTc5LTQ0ZWItYmI2Ny0wZGE5NGRlM2E5OWYiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkJPVEgiLCJpYXQiOjE3NjE4Nzk1MDAsImV4cCI6MTc2MjQ4NDMwMH0.Jb06gOgH4DUf4PPx-aS_wtXy-B35BjeN5-2Y38PPhrg
+}
+
+body:json {
+  {
+    "name": "Cà chua organic",
+    "description": "Cà chua hữu cơ tươi ngon từ nông trại địa phương",
+    "price": 25000,
+    "quantity": 100,
+    "category": "Rau củ",
+    "unit": "kg",
+    "location": "Ho Chi Minh City",
+    "images": ["https://example.com/tomato1.jpg"],
+    "tags": ["organic", "fresh", "local"],
+    "isOrganic": true,
+    "harvestDate": "2024-01-15",
+    "minOrderQuantity": 1,
+    "maxOrderQuantity": 50,
+    "weight": 0.5,
+    "storageInstructions": "Bảo quản nơi khô ráo, thoáng mát",
+    "nutritionalInfo": "Giàu vitamin C và chất xơ"
+  }
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Product created successfully", function() {
+    const product = res.getBody();
+    expect(product).to.have.property('_id');
+    expect(product.name).to.equal("Cà chua organic");
+    expect(product.price).to.equal(25000);
+  });
+  
+  // Save product ID for other tests
+  if (res.getStatus() === 201) {
+    bru.setVar("createdProductId", res.getBody()._id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

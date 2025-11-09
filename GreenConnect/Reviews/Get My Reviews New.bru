@@ -1,0 +1,30 @@
+meta {
+  name: Get My Reviews
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/reviews/my-reviews
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+tests {
+  test("should get user's reviews", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an('array');
+    
+    if (res.getBody().length > 0) {
+      expect(res.getBody()[0]).to.have.property('id');
+      expect(res.getBody()[0]).to.have.property('rating');
+      expect(res.getBody()[0]).to.have.property('comment');
+      expect(res.getBody()[0]).to.have.property('product');
+      expect(res.getBody()[0]).to.have.property('createdAt');
+    }
+  });
+}

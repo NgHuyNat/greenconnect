@@ -1,0 +1,45 @@
+meta {
+  name: Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3001/api/v1/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "identifier": "admin@admin.com",
+    "password": "123456"
+  }
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response contains access token", function() {
+    expect(res.getBody()).to.have.property('accessToken');
+    expect(res.getBody().accessToken).to.be.a('string');
+  });
+  
+  test("Response contains user info", function() {
+    expect(res.getBody()).to.have.property('user');
+    expect(res.getBody().user).to.have.property('username');
+    expect(res.getBody().user).to.have.property('email');
+  });
+  
+  // Save access token for other requests
+  if (res.getStatus() === 200) {
+    bru.setVar("authToken", res.getBody().accessToken);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

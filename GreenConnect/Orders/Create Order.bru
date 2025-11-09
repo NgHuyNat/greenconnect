@@ -1,0 +1,54 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3001/api/v1/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGZkZDY0YWIyMGIxMDVhOWNlYmQ3NTYiLCJ1c2VybmFtZSI6InRlc3R1c2VyIiwicm9sZSI6IkJVWUVSIiwiaWF0IjoxNzYxNzQzNTkxLCJleHAiOjE3NjIzNDgzOTF9.7kfuRss7Pyv3_O73ByHr6-diuHh-lLSfKMFyT_IOqIk
+}
+
+body:json {
+  {
+    "items": [
+      {
+        "productId": "{{createdProductId}}",
+        "quantity": 2,
+        "price": 250000
+      }
+    ],
+    "shippingAddress": "123 Nguyen Trai, District 5, Ho Chi Minh City",
+    "phoneNumber": "0123456789",
+    "notes": "Giao hàng vào buổi sáng"
+  }
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Order created successfully", function() {
+    const order = res.getBody();
+    expect(order).to.have.property('_id');
+    expect(order).to.have.property('items');
+    expect(order.items).to.be.an('array');
+    expect(order.items.length).to.be.greaterThan(0);
+  });
+  
+  // Save order ID for other tests
+  if (res.getStatus() === 201) {
+    bru.setVar("createdOrderId", res.getBody()._id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
