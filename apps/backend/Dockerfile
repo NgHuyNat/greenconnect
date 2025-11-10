@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-slim AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -16,39 +16,34 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-slim AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Install dumb-init and curl for healthcheck
-RUN apt-get update && apt-get install -y dumb-init curl && rm -rf /var/lib/apt/lists/*
+# Install dumb-init and wget for healthcheck
+RUN apk add --no-cache dumb-init wget
 
 # Create non-root user
-RUN groupadd -g 1001 nodejs
-RUN useradd -m -u 1001 -g nodejs nestjs
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001 -G nodejs
 
 # Copy package files
-COPY package*.json ./
+COPY --from=builder --chown=nestjs:nodejs /app/package*.json ./
 
-# Install production dependencies
-RUN npm install --only=production && npm cache clean --force
+# Install production dependencies only
+RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 
-# Create uploads directory
-RUN mkdir -p uploads && chown nestjs:nodejs uploads
+# Create uploads directory with proper permissions
+RUN mkdir -p /app/uploads && chown -R nestjs:nodejs /app/uploads
 
 # Switch to non-root user
 USER nestjs
 
-# Expose port
-EXPOSE 3001
+# Expose ports
+EXPOSE 3001 3002
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3001/health || exit 1
-
-# Start application
+# Start application with dumb-init
 CMD ["dumb-init", "node", "dist/main"]

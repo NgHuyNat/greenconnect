@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -10,17 +8,18 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
     ports:
-      - "5433:5432"  # Changed to 5433 to avoid conflict with local PostgreSQL
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - greenconnect-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d greenconnect"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   # Redis for caching and sessions
   redis:
@@ -40,21 +39,24 @@ services:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
+      target: production
     container_name: greenconnect-backend
     environment:
+      NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres123
       DB_NAME: greenconnect
+      DB_SYNC: "true"
+      DB_LOGGING: "false"
       JWT_SECRET: "greenconnect-super-secret-jwt-key-2025-production-ready-strong-key"
       JWT_EXPIRES_IN: "7d"
-      NODE_ENV: production
       PORT: 3001
       CORS_ORIGIN: "http://localhost:3000"
     ports:
       - "3001:3001"
-      - "3002:3002"  # WebSocket port
+      - "3002:3002"
     volumes:
       - ./apps/backend/uploads:/app/uploads
     depends_on:
@@ -65,20 +67,30 @@ services:
     networks:
       - greenconnect-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/v1/auth/profile"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Frontend Web App
   frontend:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
+      target: production
+      args:
+        NEXT_PUBLIC_API_URL: "http://localhost:3001/api/v1"
+        NEXT_PUBLIC_SOCKET_URL: "http://localhost:3001"
     container_name: greenconnect-frontend
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3001/api/v1"
-      NEXT_PUBLIC_SOCKET_URL: "http://localhost:3002"
+      NODE_ENV: production
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - greenconnect-network
     restart: unless-stopped
