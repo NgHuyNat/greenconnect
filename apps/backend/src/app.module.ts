@@ -11,6 +11,7 @@ import { ChatModule } from "./modules/chat/chat.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { UploadModule } from "./modules/upload/upload.module";
 import { DonationsModule } from "./modules/donations/donations.module";
+import { HealthController } from "./health.controller";
 
 @Module({
   imports: [
@@ -34,5 +35,6 @@ import { DonationsModule } from "./modules/donations/donations.module";
     UploadModule,
     DonationsModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

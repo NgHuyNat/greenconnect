@@ -3,6 +3,8 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: greenconnect-postgres
+    env_file:
+      - .env.tunnel
     environment:
       POSTGRES_DB: ${DB_NAME:-greenconnect}
       POSTGRES_USER: ${DB_USERNAME:-postgres}
@@ -27,6 +29,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: greenconnect-redis
+    env_file:
+      - .env.tunnel
     # Không expose port ra ngoài
     expose:
       - "6379"
@@ -49,6 +53,8 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: greenconnect-backend
+    env_file:
+      - .env.tunnel
     environment:
       NODE_ENV: production
       DB_HOST: postgres
@@ -94,6 +100,8 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
     container_name: greenconnect-frontend
+    env_file:
+      - .env.tunnel
     environment:
       NODE_ENV: production
     # Không expose port ra ngoài
@@ -105,6 +113,12 @@ services:
     networks:
       - greenconnect-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Nginx Reverse Proxy (chỉ cho internal routing)
   nginx:
@@ -132,6 +146,8 @@ services:
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest
     container_name: greenconnect-cloudflared
+    env_file:
+      - .env.tunnel
     restart: unless-stopped
     command: tunnel run
     environment:
