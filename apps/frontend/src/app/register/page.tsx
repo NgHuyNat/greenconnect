@@ -64,16 +64,15 @@ export default function RegisterPage() {
 
     try {
       const { confirmPassword, ...registerData } = formData;
-      const response = await fetch(
-        "http://localhost:3001/api/v1/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(registerData),
-        }
-      );
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerData),
+      });
 
       const data = await response.json();
 
@@ -82,19 +81,16 @@ export default function RegisterPage() {
       }
 
       // Auto login after successful registration
-      const loginResponse = await fetch(
-        "http://localhost:3001/api/v1/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            identifier: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
+      const loginResponse = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier: formData.email,
+          password: formData.password,
+        }),
+      });
 
       if (loginResponse.ok) {
         const loginData = await loginResponse.json();
