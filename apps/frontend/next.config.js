@@ -2,7 +2,7 @@
 const nextConfig = {
   output: "standalone",
   images: {
-    domains: ["localhost", "your-domain.com"],
+    domains: ["localhost", "greenconnect.hynat.io.vn"],
   },
   env: {
     NEXT_PUBLIC_API_URL:
