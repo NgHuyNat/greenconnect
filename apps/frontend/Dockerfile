@@ -13,8 +13,8 @@ RUN npm install
 COPY . .
 
 # Set environment variables for build
-ARG NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
-ARG NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
+ARG NEXT_PUBLIC_API_URL=https://greenconnect.hynat.io.vn/api/v1
+ARG NEXT_PUBLIC_SOCKET_URL=https://greenconnect.hynat.io.vn
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
 
