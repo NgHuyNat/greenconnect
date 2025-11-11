@@ -1,6 +1,6 @@
-import { API_URL } from "@/lib/constants";
 "use client";
 
+import { API_URL } from "@/lib/constants";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

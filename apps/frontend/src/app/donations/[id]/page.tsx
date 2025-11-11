@@ -1,6 +1,6 @@
-import { API_URL } from "@/lib/constants";
 "use client";
 
+import { API_URL } from "@/lib/constants";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
@@ -97,14 +97,11 @@ export default function DonationDetailPage() {
 
   const fetchDonation = async (id: string) => {
     try {
-      const response = await fetch(
-        `${API_URL}/donations/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/donations/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch donation");

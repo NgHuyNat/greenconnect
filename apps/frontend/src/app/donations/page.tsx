@@ -1,6 +1,6 @@
-import { API_URL } from "@/lib/constants";
 "use client";
 
+import { API_URL } from "@/lib/constants";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -197,14 +197,11 @@ export default function DonationsPage() {
       if (filters.urgencyLevel)
         queryParams.append("urgencyLevel", filters.urgencyLevel);
 
-      const response = await fetch(
-        `${API_URL}/donations?${queryParams}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/donations?${queryParams}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch donations");

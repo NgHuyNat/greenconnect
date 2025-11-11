@@ -1,6 +1,6 @@
-import { API_URL } from "@/lib/constants";
 "use client";
 
+import { API_URL } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -102,15 +102,12 @@ export default function ProductsManagementPage() {
     setDeletingProduct(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/products/${productToDelete}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/products/${productToDelete}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         setProducts(products.filter((p) => p.id !== productToDelete));

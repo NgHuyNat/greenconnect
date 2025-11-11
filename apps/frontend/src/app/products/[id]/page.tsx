@@ -1,6 +1,6 @@
-import { API_URL } from "@/lib/constants";
 "use client";
 
+import { API_URL } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
@@ -57,14 +57,11 @@ export default function ProductDetailPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/products/${productId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -94,15 +91,12 @@ export default function ProductDetailPage() {
     setDeletingProduct(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/products/${product.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/products/${product.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         router.push("/products");
