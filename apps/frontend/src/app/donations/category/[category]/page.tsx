@@ -1,3 +1,4 @@
+import { API_URL } from "@/lib/constants";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -126,7 +127,7 @@ export default function CategoryPage() {
       });
 
       const response = await fetch(
-        `http://localhost:3001/api/v1/donations/category/${category}?${queryParams}`,
+        `${API_URL}/donations/category/${category}?${queryParams}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

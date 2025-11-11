@@ -1,3 +1,4 @@
+import { API_URL } from "@/lib/constants";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -97,7 +98,7 @@ export default function DonationDetailPage() {
   const fetchDonation = async (id: string) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/v1/donations/${id}`,
+        `${API_URL}/donations/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

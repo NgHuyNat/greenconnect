@@ -1,3 +1,4 @@
+import { API_URL } from "@/lib/constants";
 "use client";
 
 import { useState } from "react";
@@ -69,7 +70,7 @@ export default function CreateDonationPage() {
       });
 
       const response = await fetch(
-        "http://localhost:3001/api/v1/upload/multiple",
+        `${API_URL}/upload/multiple",
         {
           method: "POST",
           headers: {
@@ -105,7 +106,7 @@ export default function CreateDonationPage() {
         images: imageUrls,
       };
 
-      const response = await fetch("http://localhost:3001/api/v1/donations", {
+      const response = await fetch(`${API_URL}/donations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

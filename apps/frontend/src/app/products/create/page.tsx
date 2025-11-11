@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/lib/constants";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -85,16 +86,13 @@ export default function CreateProductPage() {
         formData.append("files", file);
       });
 
-      const response = await fetch(
-        "http://localhost:3001/api/v1/upload/multiple",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(`${API_URL}/upload/multiple`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -149,7 +147,7 @@ export default function CreateProductPage() {
         images: images,
       };
 
-      const response = await fetch("http://localhost:3001/api/v1/products", {
+      const response = await fetch(`${API_URL}/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

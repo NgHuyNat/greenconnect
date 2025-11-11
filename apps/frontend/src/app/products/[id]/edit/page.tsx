@@ -1,4 +1,5 @@
-"use client";
+import { API_URL } from "@/lib/constants";
+("use client");
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -75,14 +76,11 @@ export default function EditProductPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:3001/api/v1/products/${productId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const data: Product = await response.json();
@@ -145,16 +143,13 @@ export default function EditProductPage() {
         formData.append("files", file);
       });
 
-      const response = await fetch(
-        "http://localhost:3001/api/v1/upload/multiple",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(`${API_URL}/upload/multiple`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -207,17 +202,14 @@ export default function EditProductPage() {
         images: images,
       };
 
-      const response = await fetch(
-        `http://localhost:3001/api/v1/products/${params.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(productData),
-        }
-      );
+      const response = await fetch(`${API_URL}/products/${params.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
 
       const data = await response.json();
 

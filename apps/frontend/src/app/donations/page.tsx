@@ -1,3 +1,4 @@
+import { API_URL } from "@/lib/constants";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -197,7 +198,7 @@ export default function DonationsPage() {
         queryParams.append("urgencyLevel", filters.urgencyLevel);
 
       const response = await fetch(
-        `http://localhost:3001/api/v1/donations?${queryParams}`,
+        `${API_URL}/donations?${queryParams}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

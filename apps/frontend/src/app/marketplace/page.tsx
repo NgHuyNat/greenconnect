@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import QuickChatButton from "../../components/QuickChatButton";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+
 interface Product {
   id: string;
   name: string;
@@ -66,7 +69,7 @@ export default function MarketplacePage() {
       params.append("page", currentPage.toString());
       params.append("limit", "12");
 
-      const response = await fetch(`http://localhost:3001/products?${params}`);
+      const response = await fetch(`${API_URL}/products?${params}`);
       const data = await response.json();
 
       if (response.ok) {

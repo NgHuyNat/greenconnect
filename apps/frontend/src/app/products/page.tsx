@@ -1,3 +1,4 @@
+import { API_URL } from "@/lib/constants";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -67,7 +68,7 @@ export default function ProductsManagementPage() {
       if (selectedCategory) params.append("category", selectedCategory);
 
       const response = await fetch(
-        `http://localhost:3001/api/v1/products/my-products?${params}`,
+        `${API_URL}/products/my-products?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -102,7 +103,7 @@ export default function ProductsManagementPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3001/api/v1/products/${productToDelete}`,
+        `${API_URL}/products/${productToDelete}`,
         {
           method: "DELETE",
           headers: {

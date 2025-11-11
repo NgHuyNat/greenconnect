@@ -1,3 +1,4 @@
+import { API_URL } from "@/lib/constants";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -57,7 +58,7 @@ export default function ProductDetailPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3001/api/v1/products/${productId}`,
+        `${API_URL}/products/${productId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -94,7 +95,7 @@ export default function ProductDetailPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3001/api/v1/products/${product.id}`,
+        `${API_URL}/products/${product.id}`,
         {
           method: "DELETE",
           headers: {
