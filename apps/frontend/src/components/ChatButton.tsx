@@ -19,7 +19,7 @@ export default function ChatButton() {
     if (!token) return;
 
     const socketInstance = io(
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001",
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
       {
         auth: { token },
       }
@@ -47,7 +47,7 @@ export default function ChatButton() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

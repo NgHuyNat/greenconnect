@@ -36,7 +36,7 @@ export default function ChatInitiator({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations`,
         {
           method: "POST",
           headers: {

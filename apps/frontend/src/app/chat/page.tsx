@@ -159,7 +159,7 @@ export default function ChatPage() {
     try {
       const token = localStorage.getItem("token");
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/messages/${messageId}/read`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/messages/${messageId}/read`,
         {
           method: "POST",
           headers: {

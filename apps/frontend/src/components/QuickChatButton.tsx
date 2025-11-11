@@ -48,7 +48,7 @@ export default function QuickChatButton({
 
       // Check if conversation exists
       const conversationsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ export default function QuickChatButton({
 
       // Create new conversation
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations`,
         {
           method: "POST",
           headers: {

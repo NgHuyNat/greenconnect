@@ -53,7 +53,7 @@ export function useChat() {
     if (!token) return;
 
     const socketInstance = io(
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001",
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
       {
         auth: { token },
         transports: ["websocket"],
@@ -157,7 +157,7 @@ export function useChat() {
       setLoading(true);
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -185,7 +185,7 @@ export function useChat() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations/${conversationId}/messages?limit=50`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations/${conversationId}/messages?limit=50`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -250,7 +250,7 @@ export function useChat() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/chat/conversations`,
         {
           method: "POST",
           headers: {

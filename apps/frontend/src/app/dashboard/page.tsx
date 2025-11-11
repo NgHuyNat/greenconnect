@@ -81,7 +81,7 @@ export default function DashboardPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/donations/statistics`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/donations/statistics`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

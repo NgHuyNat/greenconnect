@@ -66,7 +66,7 @@ export default function NewChatModal({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/users?limit=20`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/users?limit=20`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ export default function NewChatModal({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/api/v1/users?search=${encodeURIComponent(query)}&limit=20`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/users?search=${encodeURIComponent(query)}&limit=20`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
