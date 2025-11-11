@@ -69,16 +69,13 @@ export default function CreateDonationPage() {
         formData.append("images", file);
       });
 
-      const response = await fetch(
-        `${API_URL}/upload/multiple",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(`${API_URL}/upload/multiple`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error("Failed to upload images");
@@ -106,7 +103,7 @@ export default function CreateDonationPage() {
         images: imageUrls,
       };
 
-      const response = await fetch(`${API_URL}/donations", {
+      const response = await fetch(`${API_URL}/donations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
